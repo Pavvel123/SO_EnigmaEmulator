@@ -1,29 +1,52 @@
 #!/bin/bash
 
+# Author           : Paweł Kurpiewski ( s198203@student.pg.edu.pl )
+# Created On       : 30.05.2024
+# Last Modified By : Paweł Kurpiewski ( s198203@student.pg.edu.pl )
+# Last Modified On : 3.06.2024 
+# Version          : v1.4
+#
+# Description      :Enigma Emulator - program encrypts message using mechanism used in Enigma machines
+# Opis
+#
+# Licensed under GPL (see /usr/share/common-licenses/GPL for more details
+# or contact # the Free Software Foundation for a copy)
+
+
 PassThroughRotor()
 {
-    index=$(( ( $(echo $alphabet | grep -aob "$char" | cut -d: -f1) + position[$1] ) % 26 ))
+    index=$(( ( $(echo $alphabet | grep -aob "$char" | cut -d : -f 1) + position[$1] ) % 26 ))
     char=${rotors[$1]:$index:1}
-    index=$(( ( $(echo $alphabet | grep -aob "$char" | cut -d: -f1) - position[$1] + 26 ) % 26 ))
+    index=$(( ( $(echo $alphabet | grep -aob "$char" | cut -d : -f 1) - position[$1] ) % 26 ))
     char=${alphabet:$index:1}
 }
 
 PassThroughRotorReverse()
 {
-    index=$(( $(echo $alphabet | grep -aob "$char" | cut -d: -f1)))
+    index=$(( $(echo $alphabet | grep -aob "$char" | cut -d : -f 1)))
     char=${alphabet:$((($index + ${position[$1]}) % 26)):1}
-    index=$(( $(echo ${rotors[$1]} | grep -aob "$char" | cut -d: -f1)))
-    char=${alphabet:$((($index - ${position[$1]} + 26) % 26)):1}
+    index=$(( $(echo ${rotors[$1]} | grep -aob "$char" | cut -d : -f 1)))
+    char=${alphabet:$((($index - ${position[$1]}) % 26)):1}
 }
 
 Help()
 {
-    echo "Help"
+    echo " _____  _   _  _____  _____ ___  ___  ___  
+|  ___|| \ | ||_   _||  __ \|  \/  | / _ \ 
+| |__  |  \| |  | |  | |  \/| .  . |/ /_\ \ 
+|  __| | . ' |  | |  | | __ | |\/| ||  _  |
+| |___ | |\  | _| |_ | |_\ \| |  | || | | |
+\____/ \_| \_/ \___/  \____/\_|  |_/\_| |_/
+"
+    echo "-r - you can choose three rotors out of eight available (numbered from 1 to 8) i.e. -r 123"
+    echo "-u - you can choose one reflector out of two available (B or C) i.e. -u B"
+    echo "-f - you can select an input file, so its content will be encrypted i.e. -f input.txt"
+    echo "-s - you can select an output file, so encrypted message will be saved to it (Attention! If the file exists, this option will clear the content of it!) i.e. -s output.txt"
 }
 
 Version()
 {
-    echo v1.0
+    echo v1.4
 }
 
 ChooseRotors()
@@ -32,16 +55,12 @@ ChooseRotors()
     r2="rotor$2"
     r3="rotor$3"
     rotors=(${!r1} ${!r2} ${!r3})
-    echo ${rotors[0]}
-    echo ${rotors[1]}
-    echo ${rotors[2]}
 }
 
 ChooseReflector()
 {
     ref="reflector$1"
     reflector=${!ref}
-    echo $reflector
 }
 
 # Define the alphabet and rotors
@@ -51,19 +70,29 @@ ChooseReflector()
     rotor3="BDFHJLCPRTXVZNYEIWGAKMUSQO"
     rotor4="ESOVPZJAYQUIRHXLNFTGKDCMWB"
     rotor5="VZBRGITYUPSDNHLXAWMJQOFECK"
+    rotor6="JPGVOUMFYQBENHZRDKASXLICTW"
+    rotor7="NZJHGRCXMYSWBOUFAIVLPEKQDT"
+    rotor8="FKQHTLXOCBJSPDZRAMEWNIUYGV"
 reflectorB="YRUHQSLDPXNGOKMIEBFZCWVJAT"
 reflectorC="FVPJIAOYEDRZXWGCTKUQSBNMHL"
 
 rotors=($rotor1 $rotor2 $rotor3)
 reflector=$reflectorB
 
-while getopts hvr:u: OPT; do
+input=""
+output=""
+
+while getopts hvr:u:f:s: OPT; do
     case $OPT in
-        h) Help;;
-        v) Version;;
+        h) Help
+            exit;;
+        v) Version
+            exit;;
         r) ChooseRotors ${OPTARG:0:1} ${OPTARG:1:1} ${OPTARG:2:1};;
         u) ChooseReflector $OPTARG;;
-        *) echo "unknown option";;
+        f) input=$OPTARG;;
+        s) output=$OPTARG;;
+        *) echo "$OPT - unknown option";;
     esac
 done
 
@@ -71,7 +100,11 @@ done
 position=(0 0 0)
 
 # Read the message from the user
-read -p "Enter the message to encrypt: " message
+if [ -z $input ]; then
+    read -p "Enter the message to encrypt: " message
+else
+    message=$(cat $input)
+fi
 
 # Prepare the message
 message=$(echo $message | tr 'a-z' 'A-Z')
@@ -100,7 +133,7 @@ for (( i=0; i<${#message}; i++ )); do
     PassThroughRotor 0
 
     # Pass through the reflector
-    index=$(echo $alphabet | grep -aob "$char" | cut -d: -f1)
+    index=$(echo $alphabet | grep -aob "$char" | cut -d : -f 1)
     char=${reflector:$index:1}
 
     PassThroughRotorReverse 0
@@ -112,4 +145,8 @@ for (( i=0; i<${#message}; i++ )); do
 done
 
 # Display the encrypted message
-echo "Encrypted message: $encrypted_message"
+if [ -z $output ]; then
+    echo "Encrypted message: $encrypted_message"
+else
+    echo $encrypted_message > $output
+fi

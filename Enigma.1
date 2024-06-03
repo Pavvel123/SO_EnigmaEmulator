@@ -1,0 +1,53 @@
+.\" Manpage for enigma
+.\" Contact s198203@student.pg.edu.pl to report bugs or contribute improvements
+.TH ENIGMA 1 "June 2024" "Version 1.4" "Enigma Emulator Manual"
+
+.SH NAME
+enigma \- Enigma Emulator
+
+.SH SYNOPSIS
+.B enigma
+[\-h] [\-v] [\-r=ROTORS] [\-u=REFLECTOR] [\-f=INPUT_FILE] [\-s=OUTPUT_FILE]
+
+.SH DESCRIPTION
+Enigma Emulator encrypts messages using the mechanism used in Enigma machines.
+
+.SH OPTIONS
+.TP
+\fB\-h\fR
+Display this help message.
+
+.TP
+\fB\-v\fR
+Display version information.
+
+.TP
+\fB\-r\fR \fIROTORS\fR
+Choose three rotors out of eight available (numbered from 1 to 8). Default value: "123". Example: \fB\-r 123\fR
+
+.TP
+\fB\-u\fR \fIREFLECTOR\fR
+Choose one reflector out of two available (B or C). Default value: "B". Example: \fB\-u B\fR
+
+.TP
+\fB\-f\fR \fIINPUT_FILE\fR
+Read the input message from \fIINPUT_FILE\fR.
+
+.TP
+\fB\-s\fR \fIOUTPUT_FILE\fR
+Save the encrypted message to \fIOUTPUT_FILE\fR.
+
+.SH AUTHOR
+Written by Paweł Kurpiewski (s198203@student.pg.edu.pl).
+
+.SH REPORTING BUGS
+Report bugs to <s198203@student.pg.edu.pl>.
+
+.SH COPYRIGHT
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+.SH SEE ALSO
+More information about Enigma machines: <https://en.wikipedia.org/wiki/Enigma_machine>.
+
+The GNU General Public License: /usr/share/common-licenses/GPL.
