@@ -38,8 +38,8 @@ Help()
 | |___ | |\  | _| |_ | |_\ \| |  | || | | |
 \____/ \_| \_/ \___/  \____/\_|  |_/\_| |_/
 "
-    echo "-r - you can choose three rotors out of eight available (numbered from 1 to 8) i.e. -r 123"
-    echo "-u - you can choose one reflector out of two available (B or C) i.e. -u B"
+    echo "-r - you can choose three rotors out of eight available (numbered from 1 to 8). Default value: \"123\". i.e. -r 123"
+    echo "-u - you can choose one reflector out of two available (B or C). Default value: \"B\". i.e. -u B"
     echo "-f - you can select an input file, so its content will be encrypted i.e. -f input.txt"
     echo "-s - you can select an output file, so encrypted message will be saved to it (Attention! If the file exists, this option will clear the content of it!) i.e. -s output.txt"
 }
@@ -54,13 +54,23 @@ ChooseRotors()
     r1="rotor$1"
     r2="rotor$2"
     r3="rotor$3"
-    rotors=(${!r1} ${!r2} ${!r3})
+    if [ ! -z ${!r1} -a ! -z ${!r2} -a ! -z ${!r3} ]; then
+        rotors=(${!r1} ${!r2} ${!r3})
+    else
+        echo "Wrong rotor's number!"
+        exit 1
+    fi
 }
 
 ChooseReflector()
 {
     ref="reflector$1"
-    reflector=${!ref}
+    if [ ! -z ${!ref} ]; then
+        reflector=${!ref}
+    else
+        echo "Wrong reflector's letter!"
+        exit 1
+    fi
 }
 
 # Define the alphabet and rotors
@@ -85,9 +95,9 @@ output=""
 while getopts hvr:u:f:s: OPT; do
     case $OPT in
         h) Help
-            exit;;
+            exit 0;;
         v) Version
-            exit;;
+            exit 0;;
         r) ChooseRotors ${OPTARG:0:1} ${OPTARG:1:1} ${OPTARG:2:1};;
         u) ChooseReflector $OPTARG;;
         f) input=$OPTARG;;
@@ -149,4 +159,5 @@ if [ -z $output ]; then
     echo "Encrypted message: $encrypted_message"
 else
     echo $encrypted_message > $output
+    echo "Encrypted message saved to file $output"
 fi
